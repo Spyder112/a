@@ -1,0 +1,20 @@
+{
+    "name": "x",
+    "version": "0.0.1",
+    "description": "y",
+    "main": "server.js",
+    "scripts": {
+      "start": "node server.js"
+    },
+    "dependencies": {
+      "express": "^4.17.1",
+      "axios": "^1.2.1",
+      "puppeteer-extra": "^3.3.4",
+      "puppeteer-extra-plugin": "^3.2.2",
+      "puppeteer-extra-plugin-stealth": "^2.11.1",
+      "puppeteer": "^19.4.0"  
+    },
+    "engines": {
+      "node": "16.x"
+    }
+}
