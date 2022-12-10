@@ -41,6 +41,58 @@ const scriptTargets = [
     {
         url: "https://greasyfork.org/en/scripts/410781-diep-io-anti-afk-timeout",
         preRef: "https://greasyfork.org/en/scripts/by-site/diep.io"
+    },
+    {
+        url: "https://greasyfork.org/en/scripts/1196-view-youtube-tags",
+        preRef: "https://greasyfork.org/en/scripts/by-site/youtube.com?page=9"
+    },
+    {
+        url: "https://greasyfork.org/en/scripts/21012-youtubeext",
+        preRef: "https://greasyfork.org/en/scripts/by-site/youtube.com?page=9"
+    },
+    {
+        url: "https://greasyfork.org/en/scripts/20798-youtube-hide-volume-control",
+        preRef: "https://greasyfork.org/en/scripts/by-site/youtube.com?page=9"
+    },
+    {
+        url: "https://greasyfork.org/en/scripts/9090-youtube-add-video-id-text-field",
+        preRef: "https://greasyfork.org/en/scripts/by-site/youtube.com?page=9"
+    },
+    {
+        url: "https://greasyfork.org/en/scripts/20710-calm-down-youtube",
+        preRef: "https://greasyfork.org/en/scripts/by-site/youtube.com?page=9"
+    },
+    {
+        url: "https://greasyfork.org/en/scripts/39544-youtube-polymer-disable",
+        preRef: "https://greasyfork.org/en/scripts/by-site/youtube.com?page=9"
+    },
+    {
+        url: "https://greasyfork.org/en/scripts/412698-youtube-auto-skip-ads",
+        preRef: "https://greasyfork.org/en/scripts/by-site/youtube.com?page=9"
+    },
+    {
+        url: "https://greasyfork.org/en/scripts/413965-youtube-like-dislike-video-and-skip-ad-keyboard-shortcuts-fork-from-nerevar009",
+        preRef: "https://greasyfork.org/en/scripts/by-site/youtube.com?page=9"
+    },
+    {
+        url: "https://greasyfork.org/en/scripts/39919-youtube-suggested-video-hider-for-youtube-classic",
+        preRef: "https://greasyfork.org/en/scripts/by-site/youtube.com?page=9"
+    },
+    {
+        url: "https://greasyfork.org/en/scripts/414756-requesthook",
+        preRef: "https://greasyfork.org/en/scripts/by-site/youtube.com?page=9"
+    },
+    {
+        url: "https://greasyfork.org/en/scripts/414876-live-chat-mod-caliber",
+        preRef: "https://greasyfork.org/en/scripts/by-site/youtube.com?page=9"
+    },
+    {
+        url: "https://greasyfork.org/en/scripts/40462-youtube-no-resume",
+        preRef: "https://greasyfork.org/en/scripts/by-site/youtube.com?page=9"
+    },
+    {
+        url: "https://greasyfork.org/en/scripts/40517-youtube-resume",
+        preRef: "https://greasyfork.org/en/scripts/by-site/youtube.com?page=9"
     }
 ];
 
