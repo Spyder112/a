@@ -2,16 +2,16 @@ Array.prototype.random = function() {
     return this[Math.floor(Math.random()*this.length)];
 };
 
-const express = require("express");
-const app = express();
 const log = console.log;
 
 const ENABLE = true;
 const NETWORK_PATIENCE = 8000 + (Math.random()*3000); //per instance and global
 
-app.use(express.static("public"));
-app.get("/", (r, r2) => r2.end("0"));
-const listener = app.listen(process.env.PORT || 8080, () => log(listener.address().port));
+const server = require('http').createServer(function (req, res) {
+    res.writeHead(200);
+    res.end('0');
+});
+server.listen(process.env.PORT || 8080);
 
 const scriptTargets = [
     {
