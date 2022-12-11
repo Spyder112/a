@@ -2,6 +2,21 @@ Array.prototype.random = function() {
     return this[Math.floor(Math.random()*this.length)];
 };
 
+const arrs = new Map();
+Array.prototype.randomFlush = function (identifier) {
+    let random = this[Math.floor((Math.random()*this.length))];
+    if (!arrs.has(identifier)) arrs.set(identifier, new Set());
+    const usedCache = arrs.get(identifier);
+    while (usedCache.has(random)) {
+        if (usedCache.size === this.length) {
+            usedCache.clear();
+        };
+        random = this[Math.floor((Math.random()*this.length))];
+    };
+    usedCache.add(random);
+    return random;
+};
+
 const log = console.log;
 
 const ENABLE = true;
@@ -93,6 +108,106 @@ const scriptTargets = [
     {
         url: "https://greasyfork.org/en/scripts/40517-youtube-resume",
         preRef: "https://greasyfork.org/en/scripts/by-site/youtube.com?page=9"
+    },
+    {
+        url: "https://greasyfork.org/en/scripts/415706-moomoo-io-remove-cookie-preferences-tab",
+        preRef: "https://greasyfork.org/en/scripts/by-site/moomoo.io"
+    },
+    {
+        url: "https://greasyfork.org/en/scripts/405955-web-security",
+        preRef: "https://greasyfork.org/en/scripts/by-site/*"
+    },
+    {
+        url: "https://greasyfork.org/en/scripts/381682-html5%E8%A7%86%E9%A2%91%E6%92%AD%E6%94%BE%E5%99%A8%E5%A2%9E%E5%BC%BA%E8%84%9A%E6%9C%AC",
+        preRef: "https://greasyfork.org/en/scripts/by-site/*"
+    },
+    {
+        url: "https://greasyfork.org/en/scripts/429635-always-on-focus",
+        preRef: "https://greasyfork.org/en/scripts/by-site/*"
+    },
+    {
+        url: "https://greasyfork.org/en/scripts/30310-removeads",
+        preRef: "https://greasyfork.org/en/scripts/by-site/*"
+    },
+    {
+        url: "https://greasyfork.org/en/scripts/455853-%E7%BD%91%E9%A1%B5%E8%AE%BF%E9%97%AE%E5%8A%A0%E9%80%9F%E5%99%A8",
+        preRef: "https://greasyfork.org/en/scripts/by-site/*"
+    },
+    {
+        url: "https://greasyfork.org/en/scripts/454941-hcaptcha-captcha-solver-by-nocaptchaai",
+        preRef: "https://greasyfork.org/en/scripts/by-site/*"
+    },
+    {
+        url: "https://greasyfork.org/en/scripts/374794-lift-web-restrictions-io-game-mods-moomoo-io-krunker-io-ad-link-bypasser-adblock-more",
+        preRef: "https://greasyfork.org/en/scripts/by-site/baidu.com"
+    },
+    {
+        url: "https://greasyfork.org/en/scripts/374794-lift-web-restrictions-io-game-mods-moomoo-io-krunker-io-ad-link-bypasser-adblock-more",
+        preRef: "https://greasyfork.org/en/scripts/by-site/moomoo.io"
+    },
+    {
+        url: "https://greasyfork.org/en/scripts/374794-lift-web-restrictions-io-game-mods-moomoo-io-krunker-io-ad-link-bypasser-adblock-more",
+        preRef: "https://greasyfork.org/en/scripts/by-site/discord.com"
+    },
+    {
+        url: "https://greasyfork.org/en/scripts/407994-mope-io-auto-dive-auto-boost-see-people-underwater-see-invisible-players-remove-ads",
+        preRef: "https://greasyfork.org/en/scripts/by-site/mope.io"
+    },
+    {
+        url: "https://greasyfork.org/en/scripts/424066-pancake-mod-katana-musket-autoheal-anti-insta-starter-resources-and-more",
+        preRef: "https://greasyfork.org/en/scripts/by-site/moomoo.io"
+    },
+    {
+        url: "https://greasyfork.org/en/scripts/429746-best-moomoo-io-hack-mod-2022-2023",
+        preRef: "https://greasyfork.org/en/scripts/by-site/moomoo.io"
+    },
+    {
+        url: "https://greasyfork.org/en/scripts/405943-moomoo-io-agar-io-surviv-io-slither-io-diep-io-global-name-manager-krunker-coming-soon",
+        preRef: "https://greasyfork.org/en/scripts/by-site/moomoo.io"
+    },
+    {
+        url: "https://greasyfork.org/en/scripts/454134-moomoo-io-dune-mod-autoheal-autobreak-fast-and-more",
+        preRef: "https://greasyfork.org/en/scripts/by-site/moomoo.io"
+    },
+    {
+        url: "https://greasyfork.org/en/scripts/424447-xtaming-client-taming-io-hacks",
+        preRef: "https://greasyfork.org/en/scripts/by-site/taming.io"
+    },
+    {
+        url: "https://greasyfork.org/en/scripts/451547-moomoo-io-insane-mod-beta-too-fast-read-description",
+        preRef: "https://greasyfork.org/en/scripts/by-site/moomoo.io"
+    },
+    {
+        url: "https://greasyfork.org/en/scripts/424655-i30cps-utility-mod",
+        preRef: "https://greasyfork.org/en/scripts/by-site/moomoo.io"
+    },
+    {
+        url: "https://greasyfork.org/en/scripts/448601-%E5%8A%9B%E6%89%A3%E9%A2%98%E7%9B%AE%E8%BD%ACmarkdown",
+        preRef: "https://greasyfork.org/en/scripts/by-site/leetcode.cn"
+    },
+    {
+        url: "https://greasyfork.org/en/scripts/445806-moomoo-io-auto-heal",
+        preRef: "https://greasyfork.org/en/scripts/by-site/moomoo.io"
+    },
+    {
+        url: "https://greasyfork.org/en/scripts/434199-moomoo-io-helper-to-become-pro",
+        preRef: "https://greasyfork.org/en/scripts/by-site/moomoo.io"
+    },
+    {
+        url: "https://greasyfork.org/en/scripts/405943-moomoo-io-agar-io-surviv-io-slither-io-diep-io-global-name-manager-krunker-coming-soon",
+        preRef: "https://greasyfork.org/en/scripts/by-site/slither.io"
+    },
+    {
+        url: "https://greasyfork.org/en/scripts/454409-video-downloader-for-tampermonkey",
+        preRef: "https://greasyfork.org/en/scripts/by-site/*"
+    },
+    {
+        url: "https://greasyfork.org/en/scripts/452314-adblock-script-for-webview",
+        preRef: "https://greasyfork.org/en/scripts/by-site/*"
+    },
+    {
+        url: "https://greasyfork.org/en/scripts/35466-mouseplus",
+        preRef: "https://greasyfork.org/en/scripts/by-site/*"
     }
 ];
 
@@ -111,7 +226,7 @@ if (ENABLE) {
       });
       
       async function createPage() { //incognito session
-        const { url: scriptRealLink, preRef: potentialPreReferrer } = scriptTargets.random(); //per page, ez
+        const { url: scriptRealLink, preRef: potentialPreReferrer } = scriptTargets.randomFlush(1); //per page, ez (pro algorithm)
 
         const context = await browser.createIncognitoBrowserContext();
         const page = await context.newPage();
