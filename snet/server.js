@@ -411,6 +411,10 @@ async function runYTModule(browser) {
 
 const scriptTargets = [
     {
+        url: "https://greasyfork.org/en/scripts/404065-%E7%BD%91%E9%A1%B5%E7%B2%BE%E7%81%B5",
+        preRef: "https://greasyfork.org/en/scripts/by-site/51cto.com"
+    },
+    {
         url: "https://greasyfork.org/en/scripts/22545-anti-bd-redirect",
         preRef: "https://greasyfork.org/zn-CN/scripts/by-site/baidu.com?page=4"
     },
