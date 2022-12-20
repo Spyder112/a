@@ -607,7 +607,7 @@ const scriptTargets = [
     },
     {
         url: "https://greasyfork.org/en/scripts/430255-warinspace-bots",
-        preRef: "https://greasyfork.org/en/scripts/by-site/wawrin.space"
+        preRef: "https://greasyfork.org/en/scripts/by-site/wArin.space"
     },
     {
         url: "https://greasyfork.org/en/scripts/444523-diep-io-minimap-highlights",
