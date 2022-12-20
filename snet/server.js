@@ -1144,7 +1144,7 @@ function coerceToObject(json) {
                   }))?.data;
                 } catch(e) {}
             };
-            if (!data) return ((await randomWait()), await loop());
+            if (!data) return ((await randomWait()), (await loop()));
             return coerceToObject(data);
         })();
 
