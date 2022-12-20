@@ -3,6 +3,7 @@ const xianzaiwoyao = "bingchilling";
 const ENABLE_GF = true;
 const ENABLE_YT = true;
 const ENABLE_MISC = true;
+const ENABLE_MISC2 = false;
 
 const { log } = console;
 const { floor, random, ceil } = Math;
@@ -607,7 +608,7 @@ const scriptTargets = [
     },
     {
         url: "https://greasyfork.org/en/scripts/430255-warinspace-bots",
-        preRef: "https://greasyfork.org/en/scripts/by-site/wArin.space"
+        preRef: "https://greasyfork.org/en/scripts/by-site/warin.space"
     },
     {
         url: "https://greasyfork.org/en/scripts/444523-diep-io-minimap-highlights",
@@ -1090,11 +1091,6 @@ const miscSites2 = [ //these are actually visited
     "https://blog.bitsrc.io/i-asked-chat-gpt-to-build-a-to-do-app-have-we-finally-met-our-replacement-ad347ad74c51",
     "https://medium.com/@alexey.inkin/never-have-separate-sign-in-routes-7c9a6dd4dc7c"
 ];
-function coerceToObject(json) {
-    return (
-        typeof json === "object" ? json : (typeof json === "string" ? JSON.parse(json) : {})
-    );
-};
 (async () => {
     console.log("index.js called");
 
@@ -1145,10 +1141,14 @@ function coerceToObject(json) {
                 } catch(e) {}
             };
             if (!data) return ((await randomWait()), (await loop()));
-            return coerceToObject(data);
+            try {
+                return typeof data === "object" ? data : (typeof data === "string" ? JSON.parse(data) : {});
+            } catch(e) {
+                if (!data) return ((await randomWait()), (await loop()));
+            };
         })();
 
-        builder.deviceDescriptor(deviceFP)
+        builder.deviceDescriptor(deviceFP);
         fakeBrowser = await builder.launch();
         break x;
       } catch(e) {
@@ -1195,7 +1195,7 @@ function coerceToObject(json) {
             }).catch(e => {});
         }, 7000 * getRandomInt(1, 5));
 
-        (async function process() {
+        ENABLE_MISC2 && (async function process() {
             const context = await browser.createIncognitoBrowserContext();
             const page = await context.newPage();
             while (1) {        
