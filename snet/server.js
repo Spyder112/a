@@ -1144,7 +1144,7 @@ function coerceToObject(json) {
                   }))?.data;
                 } catch(e) {}
             };
-            if (!data) return await loop();
+            if (!data) return ((await randomWait()), await loop());
             return coerceToObject(data);
         })();
 
@@ -1152,7 +1152,8 @@ function coerceToObject(json) {
         fakeBrowser = await builder.launch();
         break x;
       } catch(e) {
-        console.warn(e)
+          console.warn(e)
+          await randomWait();
       }
     }
     
