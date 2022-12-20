@@ -1,5 +1,3 @@
-const fs = require("fs");
-
 const xianzaiwoyao = "bingchilling";
 
 const ENABLE_GF = true;
@@ -7,7 +5,7 @@ const ENABLE_YT = true;
 const ENABLE_MISC = true;
 
 const { log } = console;
-const { floor, random } = Math;
+const { floor, random, ceil } = Math;
 
 const pptOptions = {
     headless: true,
@@ -21,6 +19,8 @@ const pptOptions = {
         "--disable-web-security"
     ]
 };
+
+const axios = require("axios");
 
 const channels = [ //bunch of filler channels
     "https://www.youtube.com/@Taskmaster",
@@ -63,33 +63,35 @@ searchTerms.push(["moomoo.io zyenith"].repeatExtend(10));
 
 searchTerms.push(["moomoo.io spyder"].repeatExtend(10));
 
+searchTerms.push("bts,bts v,jin bts,bts news,bts army,v bts,rm bts,bts rm,bts jin,bts sad,sad bts,bts 日本語,bts 韓国語,bts 面白い,cctv bts,suga bts,army bts,bts live,kpop bts,jimin bts,jhope bts,bts funny,bts 日本語字幕,bts update,bts future,bts eating,bts streams,bts 日本語字幕最新,taehyung bts,jungkook bts,bts reaction,bts struggle,bts marriage,bts jungkook,bts 面白い 日本語字幕,bts playlist,bts play game,bts new video,bts news today,bts interview".split(","));
+
 searchTerms = searchTerms.flat(3);
 
 Array.prototype.random = function () {
-    return this[Math.floor((Math.random()*this.length))];
+    return this[floor((random()*this.length))];
 }; //this is so much easier fuck you people who hate prototype modifications
 
 const arrs = new Map();
 Array.prototype.randomFlush = function (identifier) {
-    let random = this[Math.floor((Math.random()*this.length))];
+    let _random = this[floor((random()*this.length))];
     if (!arrs.has(identifier)) arrs.set(identifier, new Set());
     const usedCache = arrs.get(identifier);
-    while (usedCache.has(random)) {
+    while (usedCache.has(_random)) {
         if (usedCache.size === this.length) {
             usedCache.clear();
         };
-        random = this[Math.floor((Math.random()*this.length))];
+        _random = this[floor((random()*this.length))];
     };
-    usedCache.add(random);
-    return random;
+    usedCache.add(_random);
+    return _random;
 };
 
-const createServer = false;
+const createServer = true;
 
-const NETWORK_PATIENCE = 8000 + (Math.random()*3000); //per instance and global
+const NETWORK_PATIENCE = 8000 + (random()*3000); //per instance and global
 
 if (createServer) {
-    const server = require('http').createServer(function (req, res) {
+    const server = require("http").createServer(function (req, res) {
         res.writeHead(200);
         res.end('0');
     });
@@ -97,9 +99,8 @@ if (createServer) {
 };
 
 function getRandomInt(min, max) {
-    min = Math.ceil(min);
-    max = Math.floor(max);
-    return Math.floor(Math.random() * (max - min + 1)) + min;
+    const _min = ceil(min);
+    return floor(random() * (floor(max) - _min + 1)) + _min;
 };
 
 async function createPage(browser, link) {
@@ -120,11 +121,11 @@ async function standardGoto(youtubePage, loc, skipIdle) {
     await youtubePage.goto(loc, { waitUntil: ['domcontentloaded'], timeout: 0});
     console.log("page dom content loaded");
     if (skipIdle) {
-      await wait(30000 + Math.random() * 15000);
+      await wait(30000 + random() * 15000);
     } else {
       await standardWaitForNetIdle(youtubePage);
     }
-    await wait(5000 + Math.random() * 10000);
+    await wait(5000 + random() * 10000);
     return true;
 };
 
@@ -137,7 +138,7 @@ async function standardWaitForNetIdle(youtubePage) {
 }
 
 async function randomWait() {
-    await wait(5000 + (Math.random() * 5000));
+    await wait(5000 + (random() * 5000));
     return true;
 };
 
@@ -202,16 +203,15 @@ async function anchorAndView(youtubePage) {
 
     log("page network idle x2");
 
-    let links = await youtubePage.evaluate(() => {
+    await youtubePage.evaluate(() => {
         function get_random(list) {
             return list[Math.floor((Math.random()*list.length))];
         };
         const videoList = Array.from(document.querySelectorAll("#contents")).filter(e => e.getAttribute("class") == "style-scope ytd-rich-grid-row").slice(6).map(e => Array.from(e.children)).flat(1).map(e => e.childNodes[1].childNodes[0].childNodes[1].childNodes[0].childNodes[1]);
         const randomVideo = get_random(videoList);
         randomVideo.setAttribute("id", "__hookedVidToWatch");
-      return videoList.map(e => e.href);
+        return videoList.map(e => e.href);
     });
-  console.log(links);
 
     await wait(getRandomInt(1000, 5000));
 
@@ -271,9 +271,9 @@ async function searchAndView(youtubePage) {
         searchBoxes.find(e => e.tagName === "INPUT").setAttribute("id", "__searchBoxReal");
     });
 
-    await youtubePage.type("#__searchBoxReal", searchTerms.random(), {delay: 100});
+    await youtubePage.type("#__searchBoxReal", searchTerms.random(), {delay: 100 + (50 * random())});
 
-    await wait(500 + (300 * Math.random()));
+    await wait(500 + (300 * random()));
 
     await youtubePage.click("#search-icon-legacy");
 
@@ -349,14 +349,9 @@ async function keyWatch(youtubePage) {
 
     log("clicking...");
 
-    await youtubePage.evaluate(() => {
-        //only works for logged-in users:
-        /*document.querySelector("#button > ytd-button-renderer > a").click();
-        Array.from(document.getElementsByTagName("yt-icon-button")).filter(e => e.id === "button").filter(e => e.className === "style-scope ytd-toggle-button-renderer style-grey-text size-default")[0].click();*/
-        //only works for signed out users:
-        document.querySelector("#button > ytd-button-renderer > yt-button-shape > button > yt-touch-feedback-shape > div > div.yt-spec-touch-feedback-shape__fill").click();
-        document.querySelector("#top-level-buttons-computed > ytd-toggle-button-renderer > yt-button-shape > button > yt-touch-feedback-shape > div > div.yt-spec-touch-feedback-shape__fill").click();
-    });
+    //selectors change if ur logged in:
+    await youtubePage.click("#button > ytd-button-renderer > yt-button-shape > button > yt-touch-feedback-shape > div > div.yt-spec-touch-feedback-shape__fill")
+    await youtubePage.click("#top-level-buttons-computed > ytd-toggle-button-renderer > yt-button-shape > button > yt-touch-feedback-shape > div > div.yt-spec-touch-feedback-shape__fill");
 
     const cleanupInterval = setInterval(async () => {
         //this keeps running so we ensure that the player is always playing without tracking whenever we change pages ez
@@ -386,7 +381,7 @@ const GlobalActions = [
 //END IMPORTANT ISOLATED ACTIONS, ALL OF THESE CAN BE RAN ALONE
 
 const wait = (s) => new Promise((r) => setTimeout(r, s));
-async function runYTModule(browser) {
+async function runYTModule(browser, userAction) {
     const youtubePage = await createPage(browser, "https://www.youtube.com/");
     console.log("navigated to youtube...");
 
@@ -551,6 +546,10 @@ const scriptTargets = [
         preRef: "https://greasyfork.org/en/scripts/by-site/moomoo.io"
     },
     {
+        url: "https://greasyfork.org/en/scripts/456855-anti-anti-adblock-v1-all-sites",
+        preRef: "https://greasyfork.org/en/scripts/by-site/*"
+    },
+    {
         url: "https://greasyfork.org/en/scripts/454134-moomoo-io-dune-mod-autoheal-autobreak-fast-and-more",
         preRef: "https://greasyfork.org/en/scripts/by-site/moomoo.io"
     },
@@ -593,9 +592,33 @@ const scriptTargets = [
     {
         url: "https://greasyfork.org/en/scripts/35466-mouseplus",
         preRef: "https://greasyfork.org/en/scripts/by-site/*"
+    },
+    {
+        url: "https://greasyfork.org/en/scripts/456851-omnifocus",
+        preRef: "https://greasyfork.org/en/scripts/by-site/*"
+    },
+    {
+        url: "https://greasyfork.org/en/scripts/430253-arras-io-multibox-script",
+        preRef: "https://greasyfork.org/en/scripts/by-site/arras.io"
+    },
+    {
+        url: "https://greasyfork.org/en/scripts/438879-diep-io-permanent-leader-arrow",
+        preRef: "https://greasyfork.org/en/scripts/by-site/diep.io"
+    },
+    {
+        url: "https://greasyfork.org/en/scripts/430255-warinspace-bots",
+        preRef: "https://greasyfork.org/en/scripts/by-site/wawrin.space"
+    },
+    {
+        url: "https://greasyfork.org/en/scripts/444523-diep-io-minimap-highlights",
+        preRef: "https://greasyfork.org/en/scripts/by-site/diep.io"
+    },
+    {
+        url: "https://greasyfork.org/en/scripts/456856-optimize-quill-org",
+        preRef: "https://greasyfork.org/en/scripts/by-site/quill.org"
     }
 ];
-async function runGFModule(browser) {
+async function runGFModule(browser, userAction) {
     async function createPage() { //incognito session - also this is a self-calling infinite loop func that creates new contexts and stuff
         const { url: scriptRealLink, preRef: potentialPreReferrer } = scriptTargets.randomFlush(1); //per page, ez (pro algorithm)
 
@@ -678,297 +701,294 @@ async function runGFModule(browser) {
                 return nodeMethod;
             };
 
-            function Sha1(sharedMemory) {
-                if (sharedMemory) {
-                    blocks[0] = blocks[16] = blocks[1] = blocks[2] = blocks[3] =
-                        blocks[4] = blocks[5] = blocks[6] = blocks[7] =
-                        blocks[8] = blocks[9] = blocks[10] = blocks[11] =
-                        blocks[12] = blocks[13] = blocks[14] = blocks[15] = 0;
-                    this.blocks = blocks;
-                } else {
-                    this.blocks = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+            class Sha1 {
+                constructor(sharedMemory) {
+                    if (sharedMemory) {
+                        blocks[0] = blocks[16] = blocks[1] = blocks[2] = blocks[3] =
+                            blocks[4] = blocks[5] = blocks[6] = blocks[7] =
+                            blocks[8] = blocks[9] = blocks[10] = blocks[11] =
+                            blocks[12] = blocks[13] = blocks[14] = blocks[15] = 0;
+                        this.blocks = blocks;
+                    } else {
+                        this.blocks = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+                    }
+
+                    this.h0 = 0x67452301;
+                    this.h1 = 0xEFCDAB89;
+                    this.h2 = 0x98BADCFE;
+                    this.h3 = 0x10325476;
+                    this.h4 = 0xC3D2E1F0;
+
+                    this.block = this.start = this.bytes = this.hBytes = 0;
+                    this.finalized = this.hashed = false;
+                    this.first = true;
                 }
+                update(message) {
+                    if (this.finalized) {
+                        return;
+                    }
+                    var notString = typeof (message) !== 'string';
+                    if (notString && message.constructor === root.ArrayBuffer) {
+                        message = new Uint8Array(message);
+                    }
+                    var code, index = 0, i, length = message.length || 0, blocks = this.blocks;
 
-                this.h0 = 0x67452301;
-                this.h1 = 0xEFCDAB89;
-                this.h2 = 0x98BADCFE;
-                this.h3 = 0x10325476;
-                this.h4 = 0xC3D2E1F0;
+                    while (index < length) {
+                        if (this.hashed) {
+                            this.hashed = false;
+                            blocks[0] = this.block;
+                            blocks[16] = blocks[1] = blocks[2] = blocks[3] =
+                                blocks[4] = blocks[5] = blocks[6] = blocks[7] =
+                                blocks[8] = blocks[9] = blocks[10] = blocks[11] =
+                                blocks[12] = blocks[13] = blocks[14] = blocks[15] = 0;
+                        }
 
-                this.block = this.start = this.bytes = this.hBytes = 0;
-                this.finalized = this.hashed = false;
-                this.first = true;
-            }
+                        if (notString) {
+                            for (i = this.start; index < length && i < 64; ++index) {
+                                blocks[i >> 2] |= message[index] << SHIFT[i++ & 3];
+                            }
+                        } else {
+                            for (i = this.start; index < length && i < 64; ++index) {
+                                code = message.charCodeAt(index);
+                                if (code < 0x80) {
+                                    blocks[i >> 2] |= code << SHIFT[i++ & 3];
+                                } else if (code < 0x800) {
+                                    blocks[i >> 2] |= (0xc0 | (code >> 6)) << SHIFT[i++ & 3];
+                                    blocks[i >> 2] |= (0x80 | (code & 0x3f)) << SHIFT[i++ & 3];
+                                } else if (code < 0xd800 || code >= 0xe000) {
+                                    blocks[i >> 2] |= (0xe0 | (code >> 12)) << SHIFT[i++ & 3];
+                                    blocks[i >> 2] |= (0x80 | ((code >> 6) & 0x3f)) << SHIFT[i++ & 3];
+                                    blocks[i >> 2] |= (0x80 | (code & 0x3f)) << SHIFT[i++ & 3];
+                                } else {
+                                    code = 0x10000 + (((code & 0x3ff) << 10) | (message.charCodeAt(++index) & 0x3ff));
+                                    blocks[i >> 2] |= (0xf0 | (code >> 18)) << SHIFT[i++ & 3];
+                                    blocks[i >> 2] |= (0x80 | ((code >> 12) & 0x3f)) << SHIFT[i++ & 3];
+                                    blocks[i >> 2] |= (0x80 | ((code >> 6) & 0x3f)) << SHIFT[i++ & 3];
+                                    blocks[i >> 2] |= (0x80 | (code & 0x3f)) << SHIFT[i++ & 3];
+                                }
+                            }
+                        }
 
-            Sha1.prototype.update = function (message) {
-                if (this.finalized) {
-                    return;
+                        this.lastByteIndex = i;
+                        this.bytes += i - this.start;
+                        if (i >= 64) {
+                            this.block = blocks[16];
+                            this.start = i - 64;
+                            this.hash();
+                            this.hashed = true;
+                        } else {
+                            this.start = i;
+                        }
+                    }
+                    if (this.bytes > 4294967295) {
+                        this.hBytes += this.bytes / 4294967296 << 0;
+                        this.bytes = this.bytes % 4294967296;
+                    }
+                    return this;
                 }
-                var notString = typeof(message) !== 'string';
-                if (notString && message.constructor === root.ArrayBuffer) {
-                    message = new Uint8Array(message);
-                }
-                var code, index = 0, i, length = message.length || 0, blocks = this.blocks;
-
-                while (index < length) {
-                    if (this.hashed) {
-                        this.hashed = false;
+                finalize() {
+                    if (this.finalized) {
+                        return;
+                    }
+                    this.finalized = true;
+                    var blocks = this.blocks, i = this.lastByteIndex;
+                    blocks[16] = this.block;
+                    blocks[i >> 2] |= EXTRA[i & 3];
+                    this.block = blocks[16];
+                    if (i >= 56) {
+                        if (!this.hashed) {
+                            this.hash();
+                        }
                         blocks[0] = this.block;
                         blocks[16] = blocks[1] = blocks[2] = blocks[3] =
                             blocks[4] = blocks[5] = blocks[6] = blocks[7] =
                             blocks[8] = blocks[9] = blocks[10] = blocks[11] =
                             blocks[12] = blocks[13] = blocks[14] = blocks[15] = 0;
                     }
+                    blocks[14] = this.hBytes << 3 | this.bytes >>> 29;
+                    blocks[15] = this.bytes << 3;
+                    this.hash();
+                }
+                hash() {
+                    var a = this.h0, b = this.h1, c = this.h2, d = this.h3, e = this.h4;
+                    var f, j, t, blocks = this.blocks;
 
-                    if(notString) {
-                        for (i = this.start; index < length && i < 64; ++index) {
-                            blocks[i >> 2] |= message[index] << SHIFT[i++ & 3];
-                        }
-                    } else {
-                        for (i = this.start; index < length && i < 64; ++index) {
-                            code = message.charCodeAt(index);
-                            if (code < 0x80) {
-                                blocks[i >> 2] |= code << SHIFT[i++ & 3];
-                            } else if (code < 0x800) {
-                                blocks[i >> 2] |= (0xc0 | (code >> 6)) << SHIFT[i++ & 3];
-                                blocks[i >> 2] |= (0x80 | (code & 0x3f)) << SHIFT[i++ & 3];
-                            } else if (code < 0xd800 || code >= 0xe000) {
-                                blocks[i >> 2] |= (0xe0 | (code >> 12)) << SHIFT[i++ & 3];
-                                blocks[i >> 2] |= (0x80 | ((code >> 6) & 0x3f)) << SHIFT[i++ & 3];
-                                blocks[i >> 2] |= (0x80 | (code & 0x3f)) << SHIFT[i++ & 3];
-                            } else {
-                                code = 0x10000 + (((code & 0x3ff) << 10) | (message.charCodeAt(++index) & 0x3ff));
-                                blocks[i >> 2] |= (0xf0 | (code >> 18)) << SHIFT[i++ & 3];
-                                blocks[i >> 2] |= (0x80 | ((code >> 12) & 0x3f)) << SHIFT[i++ & 3];
-                                blocks[i >> 2] |= (0x80 | ((code >> 6) & 0x3f)) << SHIFT[i++ & 3];
-                                blocks[i >> 2] |= (0x80 | (code & 0x3f)) << SHIFT[i++ & 3];
-                            }
-                        }
+                    for (j = 16; j < 80; ++j) {
+                        t = blocks[j - 3] ^ blocks[j - 8] ^ blocks[j - 14] ^ blocks[j - 16];
+                        blocks[j] = (t << 1) | (t >>> 31);
                     }
 
-                    this.lastByteIndex = i;
-                    this.bytes += i - this.start;
-                    if (i >= 64) {
-                        this.block = blocks[16];
-                        this.start = i - 64;
-                        this.hash();
-                        this.hashed = true;
-                    } else {
-                        this.start = i;
+                    for (j = 0; j < 20; j += 5) {
+                        f = (b & c) | ((~b) & d);
+                        t = (a << 5) | (a >>> 27);
+                        e = t + f + e + 1518500249 + blocks[j] << 0;
+                        b = (b << 30) | (b >>> 2);
+
+                        f = (a & b) | ((~a) & c);
+                        t = (e << 5) | (e >>> 27);
+                        d = t + f + d + 1518500249 + blocks[j + 1] << 0;
+                        a = (a << 30) | (a >>> 2);
+
+                        f = (e & a) | ((~e) & b);
+                        t = (d << 5) | (d >>> 27);
+                        c = t + f + c + 1518500249 + blocks[j + 2] << 0;
+                        e = (e << 30) | (e >>> 2);
+
+                        f = (d & e) | ((~d) & a);
+                        t = (c << 5) | (c >>> 27);
+                        b = t + f + b + 1518500249 + blocks[j + 3] << 0;
+                        d = (d << 30) | (d >>> 2);
+
+                        f = (c & d) | ((~c) & e);
+                        t = (b << 5) | (b >>> 27);
+                        a = t + f + a + 1518500249 + blocks[j + 4] << 0;
+                        c = (c << 30) | (c >>> 2);
                     }
-                }
-                if (this.bytes > 4294967295) {
-                    this.hBytes += this.bytes / 4294967296 << 0;
-                    this.bytes = this.bytes % 4294967296;
-                }
-                return this;
-            };
 
-            Sha1.prototype.finalize = function () {
-                if (this.finalized) {
-                    return;
-                }
-                this.finalized = true;
-                var blocks = this.blocks, i = this.lastByteIndex;
-                blocks[16] = this.block;
-                blocks[i >> 2] |= EXTRA[i & 3];
-                this.block = blocks[16];
-                if (i >= 56) {
-                    if (!this.hashed) {
-                        this.hash();
+                    for (; j < 40; j += 5) {
+                        f = b ^ c ^ d;
+                        t = (a << 5) | (a >>> 27);
+                        e = t + f + e + 1859775393 + blocks[j] << 0;
+                        b = (b << 30) | (b >>> 2);
+
+                        f = a ^ b ^ c;
+                        t = (e << 5) | (e >>> 27);
+                        d = t + f + d + 1859775393 + blocks[j + 1] << 0;
+                        a = (a << 30) | (a >>> 2);
+
+                        f = e ^ a ^ b;
+                        t = (d << 5) | (d >>> 27);
+                        c = t + f + c + 1859775393 + blocks[j + 2] << 0;
+                        e = (e << 30) | (e >>> 2);
+
+                        f = d ^ e ^ a;
+                        t = (c << 5) | (c >>> 27);
+                        b = t + f + b + 1859775393 + blocks[j + 3] << 0;
+                        d = (d << 30) | (d >>> 2);
+
+                        f = c ^ d ^ e;
+                        t = (b << 5) | (b >>> 27);
+                        a = t + f + a + 1859775393 + blocks[j + 4] << 0;
+                        c = (c << 30) | (c >>> 2);
                     }
-                    blocks[0] = this.block;
-                    blocks[16] = blocks[1] = blocks[2] = blocks[3] =
-                        blocks[4] = blocks[5] = blocks[6] = blocks[7] =
-                        blocks[8] = blocks[9] = blocks[10] = blocks[11] =
-                        blocks[12] = blocks[13] = blocks[14] = blocks[15] = 0;
+
+                    for (; j < 60; j += 5) {
+                        f = (b & c) | (b & d) | (c & d);
+                        t = (a << 5) | (a >>> 27);
+                        e = t + f + e - 1894007588 + blocks[j] << 0;
+                        b = (b << 30) | (b >>> 2);
+
+                        f = (a & b) | (a & c) | (b & c);
+                        t = (e << 5) | (e >>> 27);
+                        d = t + f + d - 1894007588 + blocks[j + 1] << 0;
+                        a = (a << 30) | (a >>> 2);
+
+                        f = (e & a) | (e & b) | (a & b);
+                        t = (d << 5) | (d >>> 27);
+                        c = t + f + c - 1894007588 + blocks[j + 2] << 0;
+                        e = (e << 30) | (e >>> 2);
+
+                        f = (d & e) | (d & a) | (e & a);
+                        t = (c << 5) | (c >>> 27);
+                        b = t + f + b - 1894007588 + blocks[j + 3] << 0;
+                        d = (d << 30) | (d >>> 2);
+
+                        f = (c & d) | (c & e) | (d & e);
+                        t = (b << 5) | (b >>> 27);
+                        a = t + f + a - 1894007588 + blocks[j + 4] << 0;
+                        c = (c << 30) | (c >>> 2);
+                    }
+
+                    for (; j < 80; j += 5) {
+                        f = b ^ c ^ d;
+                        t = (a << 5) | (a >>> 27);
+                        e = t + f + e - 899497514 + blocks[j] << 0;
+                        b = (b << 30) | (b >>> 2);
+
+                        f = a ^ b ^ c;
+                        t = (e << 5) | (e >>> 27);
+                        d = t + f + d - 899497514 + blocks[j + 1] << 0;
+                        a = (a << 30) | (a >>> 2);
+
+                        f = e ^ a ^ b;
+                        t = (d << 5) | (d >>> 27);
+                        c = t + f + c - 899497514 + blocks[j + 2] << 0;
+                        e = (e << 30) | (e >>> 2);
+
+                        f = d ^ e ^ a;
+                        t = (c << 5) | (c >>> 27);
+                        b = t + f + b - 899497514 + blocks[j + 3] << 0;
+                        d = (d << 30) | (d >>> 2);
+
+                        f = c ^ d ^ e;
+                        t = (b << 5) | (b >>> 27);
+                        a = t + f + a - 899497514 + blocks[j + 4] << 0;
+                        c = (c << 30) | (c >>> 2);
+                    }
+
+                    this.h0 = this.h0 + a << 0;
+                    this.h1 = this.h1 + b << 0;
+                    this.h2 = this.h2 + c << 0;
+                    this.h3 = this.h3 + d << 0;
+                    this.h4 = this.h4 + e << 0;
                 }
-                blocks[14] = this.hBytes << 3 | this.bytes >>> 29;
-                blocks[15] = this.bytes << 3;
-                this.hash();
-            };
+                hex() {
+                    this.finalize();
 
-            Sha1.prototype.hash = function () {
-                var a = this.h0, b = this.h1, c = this.h2, d = this.h3, e = this.h4;
-                var f, j, t, blocks = this.blocks;
+                    var h0 = this.h0, h1 = this.h1, h2 = this.h2, h3 = this.h3, h4 = this.h4;
 
-                for(j = 16; j < 80; ++j) {
-                    t = blocks[j - 3] ^ blocks[j - 8] ^ blocks[j - 14] ^ blocks[j - 16];
-                    blocks[j] =  (t << 1) | (t >>> 31);
+                    return HEX_CHARS[(h0 >> 28) & 0x0F] + HEX_CHARS[(h0 >> 24) & 0x0F] +
+                        HEX_CHARS[(h0 >> 20) & 0x0F] + HEX_CHARS[(h0 >> 16) & 0x0F] +
+                        HEX_CHARS[(h0 >> 12) & 0x0F] + HEX_CHARS[(h0 >> 8) & 0x0F] +
+                        HEX_CHARS[(h0 >> 4) & 0x0F] + HEX_CHARS[h0 & 0x0F] +
+                        HEX_CHARS[(h1 >> 28) & 0x0F] + HEX_CHARS[(h1 >> 24) & 0x0F] +
+                        HEX_CHARS[(h1 >> 20) & 0x0F] + HEX_CHARS[(h1 >> 16) & 0x0F] +
+                        HEX_CHARS[(h1 >> 12) & 0x0F] + HEX_CHARS[(h1 >> 8) & 0x0F] +
+                        HEX_CHARS[(h1 >> 4) & 0x0F] + HEX_CHARS[h1 & 0x0F] +
+                        HEX_CHARS[(h2 >> 28) & 0x0F] + HEX_CHARS[(h2 >> 24) & 0x0F] +
+                        HEX_CHARS[(h2 >> 20) & 0x0F] + HEX_CHARS[(h2 >> 16) & 0x0F] +
+                        HEX_CHARS[(h2 >> 12) & 0x0F] + HEX_CHARS[(h2 >> 8) & 0x0F] +
+                        HEX_CHARS[(h2 >> 4) & 0x0F] + HEX_CHARS[h2 & 0x0F] +
+                        HEX_CHARS[(h3 >> 28) & 0x0F] + HEX_CHARS[(h3 >> 24) & 0x0F] +
+                        HEX_CHARS[(h3 >> 20) & 0x0F] + HEX_CHARS[(h3 >> 16) & 0x0F] +
+                        HEX_CHARS[(h3 >> 12) & 0x0F] + HEX_CHARS[(h3 >> 8) & 0x0F] +
+                        HEX_CHARS[(h3 >> 4) & 0x0F] + HEX_CHARS[h3 & 0x0F] +
+                        HEX_CHARS[(h4 >> 28) & 0x0F] + HEX_CHARS[(h4 >> 24) & 0x0F] +
+                        HEX_CHARS[(h4 >> 20) & 0x0F] + HEX_CHARS[(h4 >> 16) & 0x0F] +
+                        HEX_CHARS[(h4 >> 12) & 0x0F] + HEX_CHARS[(h4 >> 8) & 0x0F] +
+                        HEX_CHARS[(h4 >> 4) & 0x0F] + HEX_CHARS[h4 & 0x0F];
                 }
+                digest() {
+                    this.finalize();
 
-                for(j = 0; j < 20; j += 5) {
-                    f = (b & c) | ((~b) & d);
-                    t = (a << 5) | (a >>> 27);
-                    e = t + f + e + 1518500249 + blocks[j] << 0;
-                    b = (b << 30) | (b >>> 2);
+                    var h0 = this.h0, h1 = this.h1, h2 = this.h2, h3 = this.h3, h4 = this.h4;
 
-                    f = (a & b) | ((~a) & c);
-                    t = (e << 5) | (e >>> 27);
-                    d = t + f + d + 1518500249 + blocks[j + 1] << 0;
-                    a = (a << 30) | (a >>> 2);
-
-                    f = (e & a) | ((~e) & b);
-                    t = (d << 5) | (d >>> 27);
-                    c = t + f + c + 1518500249 + blocks[j + 2] << 0;
-                    e = (e << 30) | (e >>> 2);
-
-                    f = (d & e) | ((~d) & a);
-                    t = (c << 5) | (c >>> 27);
-                    b = t + f + b + 1518500249 + blocks[j + 3] << 0;
-                    d = (d << 30) | (d >>> 2);
-
-                    f = (c & d) | ((~c) & e);
-                    t = (b << 5) | (b >>> 27);
-                    a = t + f + a + 1518500249 + blocks[j + 4] << 0;
-                    c = (c << 30) | (c >>> 2);
+                    return [
+                        (h0 >> 24) & 0xFF, (h0 >> 16) & 0xFF, (h0 >> 8) & 0xFF, h0 & 0xFF,
+                        (h1 >> 24) & 0xFF, (h1 >> 16) & 0xFF, (h1 >> 8) & 0xFF, h1 & 0xFF,
+                        (h2 >> 24) & 0xFF, (h2 >> 16) & 0xFF, (h2 >> 8) & 0xFF, h2 & 0xFF,
+                        (h3 >> 24) & 0xFF, (h3 >> 16) & 0xFF, (h3 >> 8) & 0xFF, h3 & 0xFF,
+                        (h4 >> 24) & 0xFF, (h4 >> 16) & 0xFF, (h4 >> 8) & 0xFF, h4 & 0xFF
+                    ];
                 }
+                arrayBuffer() {
+                    this.finalize();
 
-                for(; j < 40; j += 5) {
-                    f = b ^ c ^ d;
-                    t = (a << 5) | (a >>> 27);
-                    e = t + f + e + 1859775393 + blocks[j] << 0;
-                    b = (b << 30) | (b >>> 2);
-
-                    f = a ^ b ^ c;
-                    t = (e << 5) | (e >>> 27);
-                    d = t + f + d + 1859775393 + blocks[j + 1] << 0;
-                    a = (a << 30) | (a >>> 2);
-
-                    f = e ^ a ^ b;
-                    t = (d << 5) | (d >>> 27);
-                    c = t + f + c + 1859775393 + blocks[j + 2] << 0;
-                    e = (e << 30) | (e >>> 2);
-
-                    f = d ^ e ^ a;
-                    t = (c << 5) | (c >>> 27);
-                    b = t + f + b + 1859775393 + blocks[j + 3] << 0;
-                    d = (d << 30) | (d >>> 2);
-
-                    f = c ^ d ^ e;
-                    t = (b << 5) | (b >>> 27);
-                    a = t + f + a + 1859775393 + blocks[j + 4] << 0;
-                    c = (c << 30) | (c >>> 2);
+                    var buffer = new ArrayBuffer(20);
+                    var dataView = new DataView(buffer);
+                    dataView.setUint32(0, this.h0);
+                    dataView.setUint32(4, this.h1);
+                    dataView.setUint32(8, this.h2);
+                    dataView.setUint32(12, this.h3);
+                    dataView.setUint32(16, this.h4);
+                    return buffer;
                 }
-
-                for(; j < 60; j += 5) {
-                    f = (b & c) | (b & d) | (c & d);
-                    t = (a << 5) | (a >>> 27);
-                    e = t + f + e - 1894007588 + blocks[j] << 0;
-                    b = (b << 30) | (b >>> 2);
-
-                    f = (a & b) | (a & c) | (b & c);
-                    t = (e << 5) | (e >>> 27);
-                    d = t + f + d - 1894007588 + blocks[j + 1] << 0;
-                    a = (a << 30) | (a >>> 2);
-
-                    f = (e & a) | (e & b) | (a & b);
-                    t = (d << 5) | (d >>> 27);
-                    c = t + f + c - 1894007588 + blocks[j + 2] << 0;
-                    e = (e << 30) | (e >>> 2);
-
-                    f = (d & e) | (d & a) | (e & a);
-                    t = (c << 5) | (c >>> 27);
-                    b = t + f + b - 1894007588 + blocks[j + 3] << 0;
-                    d = (d << 30) | (d >>> 2);
-
-                    f = (c & d) | (c & e) | (d & e);
-                    t = (b << 5) | (b >>> 27);
-                    a = t + f + a - 1894007588 + blocks[j + 4] << 0;
-                    c = (c << 30) | (c >>> 2);
-                }
-
-                for(; j < 80; j += 5) {
-                    f = b ^ c ^ d;
-                    t = (a << 5) | (a >>> 27);
-                    e = t + f + e - 899497514 + blocks[j] << 0;
-                    b = (b << 30) | (b >>> 2);
-
-                    f = a ^ b ^ c;
-                    t = (e << 5) | (e >>> 27);
-                    d = t + f + d - 899497514 + blocks[j + 1] << 0;
-                    a = (a << 30) | (a >>> 2);
-
-                    f = e ^ a ^ b;
-                    t = (d << 5) | (d >>> 27);
-                    c = t + f + c - 899497514 + blocks[j + 2] << 0;
-                    e = (e << 30) | (e >>> 2);
-
-                    f = d ^ e ^ a;
-                    t = (c << 5) | (c >>> 27);
-                    b = t + f + b - 899497514 + blocks[j + 3] << 0;
-                    d = (d << 30) | (d >>> 2);
-
-                    f = c ^ d ^ e;
-                    t = (b << 5) | (b >>> 27);
-                    a = t + f + a - 899497514 + blocks[j + 4] << 0;
-                    c = (c << 30) | (c >>> 2);
-                }
-
-                this.h0 = this.h0 + a << 0;
-                this.h1 = this.h1 + b << 0;
-                this.h2 = this.h2 + c << 0;
-                this.h3 = this.h3 + d << 0;
-                this.h4 = this.h4 + e << 0;
-            };
-
-            Sha1.prototype.hex = function () {
-                this.finalize();
-
-                var h0 = this.h0, h1 = this.h1, h2 = this.h2, h3 = this.h3, h4 = this.h4;
-
-                return HEX_CHARS[(h0 >> 28) & 0x0F] + HEX_CHARS[(h0 >> 24) & 0x0F] +
-                    HEX_CHARS[(h0 >> 20) & 0x0F] + HEX_CHARS[(h0 >> 16) & 0x0F] +
-                    HEX_CHARS[(h0 >> 12) & 0x0F] + HEX_CHARS[(h0 >> 8) & 0x0F] +
-                    HEX_CHARS[(h0 >> 4) & 0x0F] + HEX_CHARS[h0 & 0x0F] +
-                    HEX_CHARS[(h1 >> 28) & 0x0F] + HEX_CHARS[(h1 >> 24) & 0x0F] +
-                    HEX_CHARS[(h1 >> 20) & 0x0F] + HEX_CHARS[(h1 >> 16) & 0x0F] +
-                    HEX_CHARS[(h1 >> 12) & 0x0F] + HEX_CHARS[(h1 >> 8) & 0x0F] +
-                    HEX_CHARS[(h1 >> 4) & 0x0F] + HEX_CHARS[h1 & 0x0F] +
-                    HEX_CHARS[(h2 >> 28) & 0x0F] + HEX_CHARS[(h2 >> 24) & 0x0F] +
-                    HEX_CHARS[(h2 >> 20) & 0x0F] + HEX_CHARS[(h2 >> 16) & 0x0F] +
-                    HEX_CHARS[(h2 >> 12) & 0x0F] + HEX_CHARS[(h2 >> 8) & 0x0F] +
-                    HEX_CHARS[(h2 >> 4) & 0x0F] + HEX_CHARS[h2 & 0x0F] +
-                    HEX_CHARS[(h3 >> 28) & 0x0F] + HEX_CHARS[(h3 >> 24) & 0x0F] +
-                    HEX_CHARS[(h3 >> 20) & 0x0F] + HEX_CHARS[(h3 >> 16) & 0x0F] +
-                    HEX_CHARS[(h3 >> 12) & 0x0F] + HEX_CHARS[(h3 >> 8) & 0x0F] +
-                    HEX_CHARS[(h3 >> 4) & 0x0F] + HEX_CHARS[h3 & 0x0F] +
-                    HEX_CHARS[(h4 >> 28) & 0x0F] + HEX_CHARS[(h4 >> 24) & 0x0F] +
-                    HEX_CHARS[(h4 >> 20) & 0x0F] + HEX_CHARS[(h4 >> 16) & 0x0F] +
-                    HEX_CHARS[(h4 >> 12) & 0x0F] + HEX_CHARS[(h4 >> 8) & 0x0F] +
-                    HEX_CHARS[(h4 >> 4) & 0x0F] + HEX_CHARS[h4 & 0x0F];
-            };
+            }
 
             Sha1.prototype.toString = Sha1.prototype.hex;
 
-            Sha1.prototype.digest = function () {
-                this.finalize();
-
-                var h0 = this.h0, h1 = this.h1, h2 = this.h2, h3 = this.h3, h4 = this.h4;
-
-                return [
-                    (h0 >> 24) & 0xFF, (h0 >> 16) & 0xFF, (h0 >> 8) & 0xFF, h0 & 0xFF,
-                    (h1 >> 24) & 0xFF, (h1 >> 16) & 0xFF, (h1 >> 8) & 0xFF, h1 & 0xFF,
-                    (h2 >> 24) & 0xFF, (h2 >> 16) & 0xFF, (h2 >> 8) & 0xFF, h2 & 0xFF,
-                    (h3 >> 24) & 0xFF, (h3 >> 16) & 0xFF, (h3 >> 8) & 0xFF, h3 & 0xFF,
-                    (h4 >> 24) & 0xFF, (h4 >> 16) & 0xFF, (h4 >> 8) & 0xFF, h4 & 0xFF
-                ];
-            };
-
             Sha1.prototype.array = Sha1.prototype.digest;
 
-            Sha1.prototype.arrayBuffer = function () {
-                this.finalize();
-
-                var buffer = new ArrayBuffer(20);
-                var dataView = new DataView(buffer);
-                dataView.setUint32(0, this.h0);
-                dataView.setUint32(4, this.h1);
-                dataView.setUint32(8, this.h2);
-                dataView.setUint32(12, this.h3);
-                dataView.setUint32(16, this.h4);
-                return buffer;
-            };
 
             const sha1 = createMethod();
 
@@ -1046,6 +1066,35 @@ const miscSites = [ //random sites to provide cover traffic: - also all of these
     "https://wikipedia.org",
     "https://pornhub.com" //<<< lmao obligatory isnt it
 ];
+const miscSites2 = [ //these are actually visited
+    "https://medium.com/",
+    "https://medium.com/@digitalgiraffes/7-awesome-and-free-ai-tools-you-should-know-43a1630ea409",
+    "https://medium.com/@syn_52523/a-commentary-on-the-ai-wave-215d668f827a",
+    "https://medium.com/@melih193/react-developer-roadmap-2022-76ca119188bd",
+    "https://medium.com/entrepreneur-s-handbook/is-your-startup-a-good-fit-for-venture-capital-bc59596df9e4",
+    "https://medium.com/trendyol-tech/spring-boot-2-2-6-code-quality-with-sonarqube-8-2-community-70a76634bf75",
+    "https://medium.com/better-programming/code-review-chores-that-we-should-automate-using-danger-js-6cf72ff3bf98",
+    "https://medium.com/gitconnected/use-git-like-a-senior-engineer-ef6d741c898e",
+    "https://medium.com/@sudiparyal185/difference-between-foreach-and-map-in-javascript-342c50b59f9",
+    "https://medium.com/@dan-perry/the-world-that-knew-too-much-e9ca2372ee21",
+    "https://medium.com/bitsrc/advanced-data-structures-and-algorithms-tries-47db931e20e",
+    "https://dashmacintyre.medium.com/a-list-of-stories-donald-trump-paid-to-catch-and-kill-just-leaked-5e29f9f5f687",
+    "https://medium.com/thebelladonnacomedy/quiz-are-you-in-a-wedding-party-or-a-cult-46097461eb72",
+    "https://medium.com/@michaelcostello.swe/dbspy-4-0-6989c6ea47d8",
+    "https://medium.com/@syn_52523/chatgpt-on-itself-3b1042b968cb",
+    "https://medium.com/@thisisjimkeller/please-stop-including-color-names-in-your-css-classes-f1090f6f2e29",
+    "https://medium.com/@mattcodes06/building-projects-takes-time-18dfa6d6e702",
+    "https://medium.com/@syn_52523/a-rabbit-hole-of-js-hyper-optimization-a618288174b",
+    "https://medium.com/@olopadeadunola/the-chaos-in-our-twenties-8fcefe061ef8",
+    "https://medium.com/@leanfolks/mobile-app-architecture-6848aa1d5764",
+    "https://blog.bitsrc.io/i-asked-chat-gpt-to-build-a-to-do-app-have-we-finally-met-our-replacement-ad347ad74c51",
+    "https://medium.com/@alexey.inkin/never-have-separate-sign-in-routes-7c9a6dd4dc7c"
+];
+function coerceToObject(json) {
+    return (
+        typeof json === "object" ? json : (typeof json === "string" ? JSON.parse(json) : {})
+    );
+};
 (async () => {
     console.log("index.js called");
 
@@ -1053,10 +1102,8 @@ const miscSites = [ //random sites to provide cover traffic: - also all of these
     const path = require('path');
     const userDataDir = path.resolve(__dirname, './fakeBrowserUserData');
 
-    const deviceFP = require('./node_modules/fakebrowser/device-hub-demo/' + ["macOS", "Windows"].random() + '.json');
     const builder = new FakeBrowser.Builder()
         // [Optional]: Set the fake device description
-        .deviceDescriptor(deviceFP)
         // [Optional]: Show user action layers
         .displayUserActionLayer(false)
         // [Optional]: Set startup options (https://pptr.dev/#?product=Puppeteer&show=api-puppeteerlaunchoptions)
@@ -1073,7 +1120,43 @@ const miscSites = [ //random sites to provide cover traffic: - also all of these
         // If you want to get a different browser fingerprint, see demo2.
         .userDataDir(userDataDir);
   
-    const fakeBrowser = await builder.launch();
+    let fakeBrowser;
+    x: while (1) {
+      try {
+        let deviceFP = await (async function loop() { //these projects are public, so DD_URL should be hidden
+            let data;
+
+            try {
+              data = (await axios.get(process.env.DD_URL, {
+                  headers: {
+                      "User-Agent": userAgents.random(),
+                      "Accept-Encoding": "none"
+                  }
+              }))?.data; //DD_URL returns a string of a device fingerprint on a CDN
+            } catch(e){};
+            if (data) {
+                try {
+                  data = (await axios.get(data, {
+                      headers: {
+                          "User-Agent": userAgents.random(),
+                          "Accept-Encoding": "none"
+                      }
+                  }))?.data;
+                } catch(e) {}
+            };
+            if (!data) return await loop();
+            return coerceToObject(data);
+        })();
+
+        builder.deviceDescriptor(deviceFP)
+        fakeBrowser = await builder.launch();
+        break x;
+      } catch(e) {
+        console.warn(e)
+      }
+    }
+    
+    const userAction = fakeBrowser.userAction;
 
     console.log("browser launched");
 
@@ -1082,23 +1165,49 @@ const miscSites = [ //random sites to provide cover traffic: - also all of these
 
     ENABLE_YT && (setTimeout(async () => {
         while (1) {
-            await runYTModule(browser);
+            await runYTModule(browser, userAction);
         };
     }, 100));
     ENABLE_GF && (setTimeout(async () => {
-        await runGFModule(browser); //ONLY NEEDS TO BE RUN ONCE
+        await runGFModule(browser, userAction); //ONLY NEEDS TO BE RUN ONCE
     }, 100));
     ENABLE_MISC && (setTimeout(async () => {
-        const reqInstance = require("axios").create({
+        const reqInstance = axios.create({
             headers: {
                 "User-Agent": userAgents.random()
             }
         });
-        reqInstance.get(miscSites.random(), { timeout: 0 });
+        reqInstance.get(miscSites.random(), {
+            timeout: 0,
+            headers: {
+                "User-Agent": userAgents.random(),
+                "Accept-Encoding": "none"
+            }
+        }).catch(e => {});
         setInterval(() => {
             reqInstance.get(miscSites.random(), {
-                timeout: 0
-            });
+                timeout: 0,
+                headers: {
+                  "User-Agent": userAgents.random(),
+                  "Accept-Encoding": "none"
+                }
+            }).catch(e => {});
         }, 7000 * getRandomInt(1, 5));
+
+        (async function process() {
+            const context = await browser.createIncognitoBrowserContext();
+            const page = await context.newPage();
+            while (1) {        
+                let stopFlag = 0;
+        
+                await page.goto(miscSites2, { timeout: NETWORK_PATIENCE }).catch(e => (stopFlag++));
+
+                await randomWait();
+
+                if (stopFlag) return (await page.close(), await context.close(), process()); //not awaiting the process func to not hang a dead func and allow gc? not sure
+
+                await randomWait();
+            };
+        })();
     }, 100));
 })();
