@@ -1,9 +1,21 @@
+const dom = process.env.PROJECT_DOMAIN;
+console.log(dom); //sanity check
+
 const xianzaiwoyao = "bingchilling";
 
-const ENABLE_GF = true;
-const ENABLE_YT = true;
-const ENABLE_MISC = true;
-const ENABLE_MISC2 = false;
+const NETWORK_PATIENCE = 8000 + (Math.random()*3000); //per instance and global
+const doFlags = {
+    doGF: true,
+    doYT: false,
+    doNetOnly: true,
+    doPageLoader: true,
+
+    doSelfCheck: true, //depends on doFlags.doNetOnly being true (dont worry about it)
+
+    doCreateServer: true,
+
+    doExtFingerprint: true
+};
 
 const { log } = console;
 const { floor, random, ceil } = Math;
@@ -70,7 +82,7 @@ searchTerms = searchTerms.flat(3);
 
 Array.prototype.random = function () {
     return this[floor((random()*this.length))];
-}; //this is so much easier fuck you people who hate prototype modifications
+};
 
 const arrs = new Map();
 Array.prototype.randomFlush = function (identifier) {
@@ -87,14 +99,10 @@ Array.prototype.randomFlush = function (identifier) {
     return _random;
 };
 
-const createServer = true;
-
-const NETWORK_PATIENCE = 8000 + (random()*3000); //per instance and global
-
-if (createServer) {
+if (doFlags.doCreateServer) {
     const server = require("http").createServer(function (req, res) {
         res.writeHead(200);
-        res.end('0');
+        res.end("v1");
     });
     server.listen(process.env.PORT || 8080);
 };
@@ -1113,25 +1121,18 @@ const miscSites2 = [ //these are actually visited
     const userDataDir = path.resolve(__dirname, './fakeBrowserUserData');
 
     const builder = new FakeBrowser.Builder()
-        // [Optional]: Set the fake device description
-        // [Optional]: Show user action layers
         .displayUserActionLayer(false)
-        // [Optional]: Set startup options (https://pptr.dev/#?product=Puppeteer&show=api-puppeteerlaunchoptions)
         .vanillaLaunchOptions(pptOptions)
-        .usePlugins([ //adblock please:
+        .usePlugins([
             require("puppeteer-extra-plugin-adblocker")({
               blockTrackers: true, //both of these are nondefault
               blockTrackersAndAnnoyances: true
             })
         ])
-        // Must be set: path to save user data
-        // We will create a fake device description (fake browser fingerprint) and save the browser's user cache information to this folder.
-        // Note: Once the fake browser fingerprint is created, it will not change, just like a normal user using the browser.
-        // If you want to get a different browser fingerprint, see demo2.
         .userDataDir(userDataDir);
   
     let fakeBrowser;
-    x: while (1) {
+    x: while (1) { //truly a marvel of engineering:
       try {
         let deviceFP = await (async function loop() { //these projects are public, so DD_URL should be hidden
             let data;
@@ -1142,7 +1143,7 @@ const miscSites2 = [ //these are actually visited
                       "User-Agent": userAgents.random(),
                       "Accept-Encoding": "none"
                   }
-              }))?.data; //DD_URL returns a string of a device fingerprint on a CDN
+              }))?.data;
             } catch(e){};
             if (data) {
                 try {
@@ -1162,7 +1163,7 @@ const miscSites2 = [ //these are actually visited
             };
         })();
 
-        builder.deviceDescriptor(deviceFP);
+        doFlags.doExtFingerprint && builder.deviceDescriptor(deviceFP);
         fakeBrowser = await builder.launch();
         break x;
       } catch(e) {
@@ -1178,15 +1179,15 @@ const miscSites2 = [ //these are actually visited
     // vanillaBrowser is a puppeteer.Browser object
     const browser = fakeBrowser.vanillaBrowser;
 
-    ENABLE_YT && (setTimeout(async () => {
+    doFlags.doYT && (setTimeout(async () => {
         while (1) {
             await runYTModule(browser, userAction);
         };
     }, 100));
-    ENABLE_GF && (setTimeout(async () => {
+    doFlags.doGF && (setTimeout(async () => {
         await runGFModule(browser, userAction); //ONLY NEEDS TO BE RUN ONCE
     }, 100));
-    ENABLE_MISC && (setTimeout(async () => {
+    doFlags.doNetOnly && (setTimeout(async () => {
         const reqInstance = axios.create({
             headers: {
                 "User-Agent": userAgents.random()
@@ -1209,19 +1210,44 @@ const miscSites2 = [ //these are actually visited
             }).catch(e => {});
         }, 7000 * getRandomInt(1, 5));
 
-        ENABLE_MISC2 && (async function process() {
+        doFlags.doSelfCheck && (async function _process() {
+            const page = await browser.newPage();
+            while (1) {
+                let stopFlag = 0;
+
+                await page.goto("https://" + dom + ".glitch.me/", { timeout: NETWORK_PATIENCE }).catch(e => (stopFlag++));
+                console.log("went to self...");
+
+                await randomWait();
+
+                if (stopFlag) return (await page.close(), await context.close(), await _process());
+
+                await randomWait();
+
+                await wait(60000);
+            };
+        })();
+
+        doFlags.doPageLoader && (async function _process() {
             const context = await browser.createIncognitoBrowserContext();
             const page = await context.newPage();
             while (1) {        
                 let stopFlag = 0;
         
-                await page.goto(miscSites2, { timeout: NETWORK_PATIENCE }).catch(e => (stopFlag++));
+                await page.goto(miscSites2.random(), { timeout: NETWORK_PATIENCE }).catch(e => (stopFlag++));
 
                 await randomWait();
 
-                if (stopFlag) return (await page.close(), await context.close(), process()); //not awaiting the process func to not hang a dead func and allow gc? not sure
+                if (stopFlag) return (await page.close(), await context.close(), await _process());
 
+                for (let i = 0; i < getRandomInt(1, 5); i++) {
+                    await page.keyboard.press('ArrowDown');
+                    await randomWait();
+                };
+              
                 await randomWait();
+
+                await wait(60000);
             };
         })();
     }, 100));
