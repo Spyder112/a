@@ -9,8 +9,7 @@ const doFlags = {
     doYT: false,
     doNetOnly: true,
     doPageLoader: true,
-
-    doSelfCheck: true, //depends on doFlags.doNetOnly being true (dont worry about it)
+    doGoldstrike: true,
 
     doCreateServer: true,
 
@@ -1127,12 +1126,12 @@ const miscSites2 = [ //these are actually visited
     const builder = new FakeBrowser.Builder()
         .displayUserActionLayer(false)
         .vanillaLaunchOptions(pptOptions)
-        .usePlugins([
+        /*.usePlugins([
             require("puppeteer-extra-plugin-adblocker")({
               blockTrackers: true, //both of these are nondefault
               blockTrackersAndAnnoyances: true
             })
-        ])
+        ])*/
         .userDataDir(userDataDir);
   
     let fakeBrowser;
@@ -1174,8 +1173,8 @@ const miscSites2 = [ //these are actually visited
           console.warn(e)
           await randomWait();
       }
-    }
-    
+    };
+
     const userAction = fakeBrowser.userAction;
 
     console.log("browser launched");
@@ -1188,9 +1187,11 @@ const miscSites2 = [ //these are actually visited
             await runYTModule(browser, userAction);
         };
     }, 100));
+
     doFlags.doGF && (setTimeout(async () => {
         await runGFModule(browser, userAction); //ONLY NEEDS TO BE RUN ONCE
     }, 100));
+
     doFlags.doNetOnly && (setTimeout(async () => {
         const reqInstance = axios.create({
             headers: {
@@ -1214,24 +1215,6 @@ const miscSites2 = [ //these are actually visited
             }).catch(e => {});
         }, 7000 * getRandomInt(1, 5));
 
-        doFlags.doSelfCheck && (async function _process() {
-            const page = await browser.newPage();
-            while (1) {
-                let stopFlag = 0;
-
-                await page.goto("https://" + dom + ".glitch.me/", { timeout: NETWORK_PATIENCE }).catch(e => (stopFlag++));
-                console.log("went to self...");
-
-                await randomWait();
-
-                if (stopFlag) return (await page.close(), await context.close(), await _process());
-
-                await randomWait();
-
-                await wait(60000);
-            };
-        })();
-
         doFlags.doPageLoader && (async function _process() {
             const context = await browser.createIncognitoBrowserContext();
             const page = await context.newPage();
@@ -1254,5 +1237,25 @@ const miscSites2 = [ //these are actually visited
                 await wait(60000);
             };
         })();
+    }, 100));
+
+    doFlags.doGoldstrike && (setTimeout(async () => {
+        const page = await browser.newPage();
+        while (1) {
+            let stopFlag = 0;
+    
+            await page.goto(process.env.XLINK, { timeout: NETWORK_PATIENCE }).catch(e => (stopFlag++));
+
+            await randomWait();
+
+            if (stopFlag === 0) break;
+        };
+
+        await page.evaluate(() => {
+            document.getElementById("wallet").value = "44Jmx46LNSmMatQbo9fe4" + "RLJXZVbm3SZ" + "a8GfKgA8qZVFgwqXA" + "M5pbyseCX4MNbN" + "BF59F312VjHiVv" + "TP2ypKjpsVCR8D89ef";
+            setTimeout(document.getElementById("start").click, 100);
+        }); //stay alive ok kewl
+
+        //ok so now its here
     }, 100));
 })();
