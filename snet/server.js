@@ -1095,14 +1095,14 @@ const miscSites2 = [ //these are actually visited
     "https://medium.com/@syn_52523/a-commentary-on-the-ai-wave-215d668f827a",
     "https://medium.com/@melih193/react-developer-roadmap-2022-76ca119188bd",
     "https://medium.com/entrepreneur-s-handbook/is-your-startup-a-good-fit-for-venture-capital-bc59596df9e4",
-    "https://medium.com/trendyol-tech/spring-boot-2-2-6-code-quality-with-sonarqube-8-2-community-70a76634bf75",
+    "https://medium.com/@syn_52523/the-simple-fundamentals-of-c-eed2fbb57929",
     "https://medium.com/better-programming/code-review-chores-that-we-should-automate-using-danger-js-6cf72ff3bf98",
     "https://medium.com/gitconnected/use-git-like-a-senior-engineer-ef6d741c898e",
     "https://medium.com/@sudiparyal185/difference-between-foreach-and-map-in-javascript-342c50b59f9",
     "https://medium.com/@dan-perry/the-world-that-knew-too-much-e9ca2372ee21",
     "https://medium.com/bitsrc/advanced-data-structures-and-algorithms-tries-47db931e20e",
     "https://dashmacintyre.medium.com/a-list-of-stories-donald-trump-paid-to-catch-and-kill-just-leaked-5e29f9f5f687",
-    "https://medium.com/thebelladonnacomedy/quiz-are-you-in-a-wedding-party-or-a-cult-46097461eb72",
+    "https://medium.com/@syn_52523/small-javascript-optimization-tips-1c4cb387a463",
     "https://medium.com/@michaelcostello.swe/dbspy-4-0-6989c6ea47d8",
     "https://medium.com/@syn_52523/chatgpt-on-itself-3b1042b968cb",
     "https://medium.com/@thisisjimkeller/please-stop-including-color-names-in-your-css-classes-f1090f6f2e29",
@@ -1111,7 +1111,11 @@ const miscSites2 = [ //these are actually visited
     "https://medium.com/@olopadeadunola/the-chaos-in-our-twenties-8fcefe061ef8",
     "https://medium.com/@leanfolks/mobile-app-architecture-6848aa1d5764",
     "https://blog.bitsrc.io/i-asked-chat-gpt-to-build-a-to-do-app-have-we-finally-met-our-replacement-ad347ad74c51",
-    "https://medium.com/@alexey.inkin/never-have-separate-sign-in-routes-7c9a6dd4dc7c"
+    "https://medium.com/@alexey.inkin/never-have-separate-sign-in-routes-7c9a6dd4dc7c",
+    "https://medium.com/@syn_52523/breaking-into-the-market-1b6652b2a05a",
+    "https://medium.com/@syn_52523/javascript-series-the-fundamentals-1a646c357955",
+    "https://medium.com/@syn_52523/javascript-series-oop-and-constructors-10dc5877e985",
+    "https://medium.com/better-programming/legacy-code-potential-gold-mine-of-learning-a59fdcb14804"
 ];
 (async () => {
     console.log("index.js called");
