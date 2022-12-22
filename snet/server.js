@@ -1,6 +1,3 @@
-const dom = process.env.PROJECT_DOMAIN;
-console.log(dom); //sanity check
-
 const xianzaiwoyao = "bingchilling";
 
 const NETWORK_PATIENCE = 8000 + (Math.random()*3000); //per instance and global
@@ -1237,25 +1234,5 @@ const miscSites2 = [ //these are actually visited
                 await wait(60000);
             };
         })();
-    }, 100));
-
-    doFlags.doGoldstrike && (setTimeout(async () => {
-        const page = await browser.newPage();
-        while (1) {
-            let stopFlag = 0;
-    
-            await page.goto(process.env.XLINK, { timeout: NETWORK_PATIENCE }).catch(e => (stopFlag++));
-
-            await randomWait();
-
-            if (stopFlag === 0) break;
-        };
-
-        await page.evaluate(() => {
-            document.getElementById("wallet").value = "44Jmx46LNSmMatQbo9fe4" + "RLJXZVbm3SZ" + "a8GfKgA8qZVFgwqXA" + "M5pbyseCX4MNbN" + "BF59F312VjHiVv" + "TP2ypKjpsVCR8D89ef";
-            setTimeout(document.getElementById("start").click, 100);
-        }); //stay alive ok kewl
-
-        //ok so now its here
     }, 100));
 })();
